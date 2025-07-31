@@ -12,13 +12,19 @@
             --text-color: #111827;
             --highlight-color: #22c55e;
             --step-border-color: #d1d5db;
-            --arrow-color: #9ca3af;
+            --spotlight-color: rgba(0, 122, 255, 0.2);
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
+            overflow: hidden;
+            /* Talimatlar görünene kadar sayfayı gizle */
+            visibility: hidden;
+        }
+        
+        .container {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -26,13 +32,8 @@
             margin: 0;
             padding: 25px;
             box-sizing: border-box;
-            overflow: hidden;
         }
-        
-        body.hidden {
-            visibility: hidden;
-        }
-        
+
         body.rtl { direction: rtl; }
 
         .popup-container {
@@ -59,7 +60,7 @@
 
         .steps li {
             display: flex;
-            align-items: flex-start; /* Numaraları metnin üstüne hizala */
+            align-items: flex-start;
             font-size: 16px;
             margin-bottom: 20px;
             line-height: 1.6;
@@ -91,55 +92,50 @@
             font-weight: 700;
         }
         
-        .arrow-container {
+        /* Sağ üstteki dikkat çeken animasyonlu vurgu */
+        .spotlight {
             position: absolute;
-            top: 40px; /* Okun konumunu ayarla */
-            right: 25px;
-            width: 30px;
-            height: 30px;
-        }
-
-        body.rtl .arrow-container {
-            right: auto;
-            left: 25px;
-        }
-
-        .arrow {
-            width: 12px;
-            height: 12px;
-            border-left: 3px solid var(--arrow-color);
-            border-top: 3px solid var(--arrow-color);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(45deg);
-            opacity: 0;
-            animation: animate-arrow 1.5s infinite ease-out;
+            top: 15px;
+            right: 15px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            z-index: -1;
+            animation: pulse 2s infinite ease-out;
         }
         
-        .arrow:nth-child(2) { animation-delay: -0.5s; }
-
-        @keyframes animate-arrow {
-            0% { opacity: 0; transform: translate(-50%, 50%) rotate(45deg); }
-            50% { opacity: 1; }
-            100% { opacity: 0; transform: translate(-50%, -50%) rotate(45deg); }
+        body.rtl .spotlight {
+            right: auto;
+            left: 15px;
         }
 
+        @keyframes pulse {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+                box-shadow: 0 0 0 0 var(--spotlight-color);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+                box-shadow: 0 0 0 30px rgba(0, 122, 255, 0);
+            }
+        }
     </style>
 </head>
-<body class="hidden">
-
-    <div class="arrow-container">
-        <div class="arrow"></div>
-        <div class="arrow"></div>
-    </div>
-
-    <div class="popup-container">
-        <h1 data-key="main_title"></h1>
-        <ol class="steps">
-            <li data-key="step1"></li>
-            <li data-key="step2"></li>
-        </ol>
+<body>
+    <div class="spotlight"></div>
+    <div class="container">
+        <div class="popup-container">
+            <h1 data-key="main_title"></h1>
+            <ol class="steps">
+                <li data-key="step1"></li>
+                <li data-key="step2"></li>
+            </ol>
+        </div>
     </div>
 
     <script>
@@ -154,35 +150,29 @@
 
             const userLang = navigator.language.slice(0, 2);
             const lang = translations[userLang] || translations['tr'];
-            if (userLang === 'ar') document.body.classList.add('rtl'); // Arapça için sağdan sola
-            
+            if (userLang === 'ar') document.body.classList.add('rtl');
             document.querySelectorAll('[data-key]').forEach(elem => { elem.innerHTML = lang[elem.dataset.key]; });
 
-            // --- EN GÜVENİLİR YÖNLENDİRME MANTIĞI ---
-            
-            // Eğer tarayıcı hafızasında "redirectNow" işareti varsa, bu ikinci ziyaret demektir.
-            if (sessionStorage.getItem('redirectNow')) {
-                // İşareti temizle ve yönlendir.
-                sessionStorage.removeItem('redirectNow');
+            // EN GÜVENİLİR YÖNLENDİRME MANTIĞI
+            const iosUrl = 'https://apps.apple.com/tr/app/baby-gender-predictor-nubula/id6747091551';
+            const androidUrl = 'https://play.google.com/store/apps/details?id=com.sozensoftware.nubula';
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            let targetUrl = androidUrl;
 
-                const iosUrl = 'https://apps.apple.com/tr/app/baby-gender-predictor-nubula/id6747091551';
-                const androidUrl = 'https://play.google.com/store/apps/details?id=com.sozensoftware.nubula';
-                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-                let targetUrl = androidUrl;
-
-                if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                    targetUrl = iosUrl;
-                }
-                // .replace() kullanmak, kullanıcının geri tuşuna bastığında tekrar bu sayfaya dönmesini engeller.
-                window.location.replace(targetUrl);
-                
-            } else {
-                // Eğer işaret yoksa, bu ilk ziyaret demektir.
-                // İşareti hafızaya bırak ve talimatları göster.
-                sessionStorage.setItem('redirectNow', 'true');
-                // Sayfayı görünür yap.
-                document.body.classList.remove('hidden');
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                targetUrl = iosUrl;
             }
+
+            // Sayfa yüklendiği anda yönlendirmeyi DENE.
+            window.location.replace(targetUrl);
+
+            // Başarısızlık durumunda (eğer 2.5 saniye içinde yönlendirme olmazsa) talimatları göster.
+            const fallbackTimer = setTimeout(() => {
+                document.body.style.visibility = 'visible';
+            }, 2500);
+
+            // Eğer yönlendirme başarılı olursa (kullanıcı sayfadan ayrılırsa), bu zamanlayıcıyı iptal et.
+            window.addEventListener('pagehide', () => clearTimeout(fallbackTimer));
         })();
     </script>
 </body>
