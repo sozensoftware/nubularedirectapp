@@ -21,7 +21,7 @@
             overflow: hidden;
         }
         
-        /* Başlangıçta talimatları gizle */
+        /* DEĞİŞİKLİK: Başlangıçta talimatlar artık GİZLİ DEĞİL. Doğrudan gösterilecek. */
         .container {
             display: flex;
             justify-content: center;
@@ -30,8 +30,7 @@
             margin: 0;
             padding: 25px;
             box-sizing: border-box;
-            opacity: 0;
-            visibility: hidden;
+            /* opacity ve visibility kaldırıldı */
             transition: opacity 0.3s ease-in-out;
         }
 
@@ -187,18 +186,10 @@
                 targetUrl = iosUrl;
             }
 
-            // Sayfa yüklendiği anda yönlendirmeyi DENE.
-            window.location.replace(targetUrl);
-
-            // Başarısızlık durumunda (eğer yönlendirme hemen olmazsa) talimatları göster.
-            const fallbackTimer = setTimeout(() => {
-                const container = document.querySelector('.container');
-                container.style.visibility = 'visible';
-                container.style.opacity = '1';
-            }, 0); // <-- DEĞİŞİKLİK: Bekleme süresi 2000'den 0'a düşürüldü.
-
-            // Eğer yönlendirme başarılı olursa (kullanıcı sayfadan ayrılırsa), bu zamanlayıcıyı iptal et.
-            window.addEventListener('pagehide', () => clearTimeout(fallbackTimer));
+            // DEĞİŞİKLİK: Fallback (zamanlayıcı) mantığı tamamen kaldırıldı.
+            // Sayfa zaten talimatları gösterir halde yükleniyor.
+            // Şimdi SADECE yönlendirmeyi deniyoruz.
+            window.location.href = targetUrl;
 
         })();
     </script>
