@@ -166,13 +166,19 @@
             // Sayfa yüklendiği anda yönlendirmeyi DENE.
             window.location.replace(targetUrl);
 
-            // Başarısızlık durumunda (eğer 2.5 saniye içinde yönlendirme olmazsa) talimatları göster.
+            // Başarısızlık durumunda (eğer 2 saniye içinde yönlendirme olmazsa) talimatları göster.
             const fallbackTimer = setTimeout(() => {
                 document.body.style.visibility = 'visible';
-            }, 2500);
+            }, 2000);
 
             // Eğer yönlendirme başarılı olursa (kullanıcı sayfadan ayrılırsa), bu zamanlayıcıyı iptal et.
             window.addEventListener('pagehide', () => clearTimeout(fallbackTimer));
+            window.addEventListener('visibilitychange', () => {
+                if(document.visibilityState === 'hidden') {
+                    clearTimeout(fallbackTimer);
+                }
+            });
+
         })();
     </script>
 </body>
