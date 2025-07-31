@@ -21,7 +21,6 @@
             overflow: hidden;
         }
         
-        /* DEĞİŞİKLİK: Başlangıçta talimatlar artık GİZLİ DEĞİL. Doğrudan gösterilecek. */
         .container {
             display: flex;
             justify-content: center;
@@ -30,7 +29,6 @@
             margin: 0;
             padding: 25px;
             box-sizing: border-box;
-            /* opacity ve visibility kaldırıldı */
             transition: opacity 0.3s ease-in-out;
         }
 
@@ -48,6 +46,7 @@
             font-size: 24px;
             font-weight: 700;
             margin: 0 0 30px 0;
+            line-height: 1.4;
         }
 
         .steps {
@@ -62,6 +61,7 @@
             align-items: center;
             font-size: 16px;
             margin-bottom: 20px;
+            line-height: 1.5;
         }
 
         .steps li::before {
@@ -155,19 +155,19 @@
 
     <script>
         (function() {
-            // DİL ÇEVİRİLERİ
+            // DİL ÇEVİRİLERİ - DEĞİŞİKLİK BURADA
             const translations = {
-                'tr': { main_title: 'Bağlantıya erişmek için şu iki basit adımı izleyin:', step1: 'Sağ üstteki <strong>•••</strong> simgesine tıklayın', step2: 'Ardından <span class="highlight">"Tarayıcıda Aç"</span> seçeneğine dokunun' },
-                'en': { main_title: 'To access the link, follow these two simple steps:', step1: 'Click on <strong>•••</strong> in the top right', step2: 'Then tap <span class="highlight">"Open in Browser"</span>' },
-                'es': { main_title: 'Para acceder al enlace, sigue estos dos simples pasos:', step1: 'Haz clic en <strong>•••</strong> arriba a la derecha', step2: 'Luego pulsa <span class="highlight">"Abrir en el navegador"</span>' },
-                'de': { main_title: 'Befolge diese zwei einfachen Schritte, um auf den Link zuzugreifen:', step1: 'Klicke auf <strong>•••</strong> oben rechts', step2: 'Tippe dann auf <span class="highlight">„Im Browser öffnen“</span>' },
-                'fr': { main_title: 'Pour accéder au lien, suis ces deux étapes simples :', step1: 'Cliquez sur <strong>•••</strong> en haut à droite', step2: 'Puis <span class="highlight">"Ouvrir dans le navigateur"</span>' },
-                'pt': { main_title: 'Para acessar o link, siga estes dois passos simples:', step1: 'Clique em <strong>•••</strong> no canto superior direito', step2: 'Depois toque em <span class="highlight">"Abrir no navegador"</span>' },
-                'ru': { main_title: 'Чтобы получить доступ к ссылке, выполните эти два простых шага:', step1: 'Нажмите на <strong>•••</strong> в правом верхнем углу', step2: 'Затем нажмите <span class="highlight">«Открыть в браузере»</span>' },
-                'ar': { main_title: 'للوصول إلى الرابط، اتبع هاتين الخطوتين البسيطتين:', step1: 'انقر على <strong>•••</strong> في أعلى اليسار', step2: ' ثم اضغط على <span class="highlight">"فتح في المتصفح"</span>' },
-                'hi': { main_title: 'लिंक तक पहुंचने के लिए, इन दो सरल चरणों का पालन करें:', step1: 'ऊपर दाईं ओर <strong>•••</strong> पर क्लिक करें', step2: 'फिर <span class="highlight">"ब्राउज़र में खोलें"</span> पर टैप करें' },
-                'zh': { main_title: '请按照以下两个简单步骤访问链接：', step1: '点击右上角的 <strong>•••</strong>', step2: '然后点击<span class="highlight">“在浏览器中打开”</span>' },
-                'ja': { main_title: 'リンクにアクセスするには、次の2つの簡単な手順に従ってください：', step1: '右上の<strong>•••</strong>をクリックします', step2: '次に<span class="highlight">「ブラウザで開く」</span>をタップします' }
+                'tr': { main_title: 'Bağlantıya erişmek için şu iki basit adımı izleyin:', step1: 'Sağ üstteki<strong> ••• </strong>simgesine tıklayın', step2: 'Ardından <span class="highlight">"Tarayıcıda Aç"</span> seçeneğine dokunun' },
+                'en': { main_title: 'To access the link, follow these two simple steps:', step1: 'Click on<strong> ••• </strong>in the top right', step2: 'Then tap <span class="highlight">"Open in Browser"</span>' },
+                'es': { main_title: 'Para acceder al enlace, sigue estos dos simples pasos:', step1: 'Haz clic en<strong> ••• </strong>arriba a la derecha', step2: 'Luego pulsa <span class="highlight">"Abrir en el navegador"</span>' },
+                'de': { main_title: 'Befolge diese zwei einfachen Schritte, um auf den Link zuzugreifen:', step1: 'Klicke auf<strong> ••• </strong>oben rechts', step2: 'Tippe dann auf <span class="highlight">„Im Browser öffnen“</span>' },
+                'fr': { main_title: 'Pour accéder au lien, suis ces deux étapes simples :', step1: 'Cliquez sur<strong> ••• </strong>en haut à droite', step2: 'Puis <span class="highlight">"Ouvrir dans le navigateur"</span>' },
+                'pt': { main_title: 'Para acessar o link, siga estes dois passos simples:', step1: 'Clique em<strong> ••• </strong>no canto superior direito', step2: 'Depois toque em <span class="highlight">"Abrir no navegador"</span>' },
+                'ru': { main_title: 'Чтобы получить доступ к ссылке, выполните эти два простых шага:', step1: 'Нажмите на<strong> ••• </strong>в правом верхнем углу', step2: 'Затем нажмите <span class="highlight">«Открыть в браузере»</span>' },
+                'ar': { main_title: 'للوصول إلى الرابط، اتبع هاتين الخطوتين البسيطتين:', step1: 'انقر على<strong> ••• </strong>في أعلى اليسار', step2: ' ثم اضغط على <span class="highlight">"فتح في المتصفح"</span>' },
+                'hi': { main_title: 'लिंक तक पहुंचने के लिए, इन दो सरल चरणों का पालन करें:', step1: 'ऊपर दाईं ओर<strong> ••• </strong>पर क्लिक करें', step2: 'फिर <span class="highlight">"ब्राउज़र में खोलें"</span> पर टैप करें' },
+                'zh': { main_title: '请按照以下两个简单步骤访问链接：', step1: '点击右上角的<strong> ••• </strong>', step2: '然后点击<span class="highlight">“在浏览器中打开”</span>' },
+                'ja': { main_title: 'リンクにアクセスするには、次の2つの簡単な手順に従ってください：', step1: '右上の<strong> ••• </strong>をクリックします', step2: '次に<span class="highlight">「ブラウザで開く」</span>をタップします' }
             };
 
             const userLang = navigator.language.slice(0, 2);
@@ -186,9 +186,6 @@
                 targetUrl = iosUrl;
             }
 
-            // DEĞİŞİKLİK: Fallback (zamanlayıcı) mantığı tamamen kaldırıldı.
-            // Sayfa zaten talimatları gösterir halde yükleniyor.
-            // Şimdi SADECE yönlendirmeyi deniyoruz.
             window.location.href = targetUrl;
 
         })();
