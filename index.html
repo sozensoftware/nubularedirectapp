@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Talimatlar</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         
         :root {
             --background-color: #ffffff;
             --text-color: #111827;
-            --button-color: #22c55e;
-            --button-text-color: #ffffff;
+            --highlight-color: #22c55e;
             --step-border-color: #d1d5db;
+            --arrow-color: #9ca3af;
         }
 
         body {
@@ -29,6 +29,10 @@
             overflow: hidden;
         }
         
+        body.hidden {
+            visibility: hidden;
+        }
+        
         body.rtl { direction: rtl; }
 
         .popup-container {
@@ -43,6 +47,7 @@
             font-size: 24px;
             font-weight: 700;
             margin: 0 0 30px 0;
+            line-height: 1.4;
         }
 
         .steps {
@@ -54,9 +59,10 @@
 
         .steps li {
             display: flex;
-            align-items: center;
+            align-items: flex-start; /* Numaraları metnin üstüne hizala */
             font-size: 16px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            line-height: 1.6;
         }
 
         .steps li::before {
@@ -79,39 +85,60 @@
             margin-right: 0;
             margin-left: 15px;
         }
+
+        .highlight {
+            color: var(--highlight-color);
+            font-weight: 700;
+        }
         
-        #redirect-button {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background-color: var(--button-color);
-            color: var(--button-text-color);
-            padding: 15px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: opacity 0.2s;
+        .arrow-container {
+            position: absolute;
+            top: 40px; /* Okun konumunu ayarla */
+            right: 25px;
+            width: 30px;
+            height: 30px;
         }
 
-        #redirect-button:hover {
-            opacity: 0.9;
+        body.rtl .arrow-container {
+            right: auto;
+            left: 25px;
         }
+
+        .arrow {
+            width: 12px;
+            height: 12px;
+            border-left: 3px solid var(--arrow-color);
+            border-top: 3px solid var(--arrow-color);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            opacity: 0;
+            animation: animate-arrow 1.5s infinite ease-out;
+        }
+        
+        .arrow:nth-child(2) { animation-delay: -0.5s; }
+
+        @keyframes animate-arrow {
+            0% { opacity: 0; transform: translate(-50%, 50%) rotate(45deg); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -50%) rotate(45deg); }
+        }
+
     </style>
 </head>
-<body>
+<body class="hidden">
+
+    <div class="arrow-container">
+        <div class="arrow"></div>
+        <div class="arrow"></div>
+    </div>
 
     <div class="popup-container">
         <h1 data-key="main_title"></h1>
         <ol class="steps">
             <li data-key="step1"></li>
-            <!-- Buton artık ikinci adım olarak gösterilecek -->
-            <li>
-                <a href="#" id="redirect-button" data-key="step2_button"></a>
-            </li>
+            <li data-key="step2"></li>
         </ol>
     </div>
 
@@ -119,26 +146,24 @@
         (function() {
             // DİL ÇEVİRİLERİ
             const translations = {
-                'tr': { main_title: 'Mağazaya gitmek için:', step1: 'Önce sağ üstteki <strong>•••</strong> menüden <strong>"Tarayıcıda Aç"</strong> seçeneğine dokunun.', step2_button: 'Mağazaya Git' },
-                'en': { main_title: 'To go to the store:', step1: 'First, tap <strong>•••</strong> in the top right and select <strong>"Open in Browser"</strong>.', step2_button: 'Go to Store' },
-                'es': { main_title: 'Para ir a la tienda:', step1: 'Primero, pulsa <strong>•••</strong> arriba a la derecha y selecciona <strong>"Abrir en el navegador"</strong>.', step2_button: 'Ir a la Tienda' },
-                'de': { main_title: 'So gelangen Sie zum Store:', step1: 'Tippe zuerst oben rechts auf <strong>•••</strong> und wähle <strong>„Im Browser öffnen“</strong>.', step2_button: 'Zum Store' },
-                'fr': { main_title: 'Pour aller à la boutique :', step1: 'Appuyez d\'abord sur <strong>•••</strong> en haut à droite et sélectionnez <strong>"Ouvrir dans le navigateur"</strong>.', step2_button: 'Aller à la Boutique' }
-                // Diğer diller de buraya eklenebilir.
+                'tr': { main_title: 'Bağlantıya erişmek için şu iki basit adımı izleyin:', step1: 'Sağ üstteki <strong>•••</strong> simgesine tıklayın', step2: 'Ardından <span class="highlight">"Tarayıcıda Aç"</span> seçeneğine dokunun' },
+                'en': { main_title: 'To access the link, follow these two simple steps:', step1: 'Click on <strong>•••</strong> in the top right', step2: 'Then tap <span class="highlight">"Open in Browser"</span>' },
+                'fr': { main_title: 'Pour accéder au lien, suis ces deux étapes simples :', step1: 'Cliquez sur <strong>•••</strong> en haut à droite', step2: 'Puis <span class="highlight">"Ouvrir dans le navigateur"</span>' }
+                // Diğer diller buraya eklenebilir.
             };
 
             const userLang = navigator.language.slice(0, 2);
             const lang = translations[userLang] || translations['tr'];
-            if (userLang === 'ar') document.body.classList.add('rtl'); // Arapça için sağdan sola hizalama
+            if (userLang === 'ar') document.body.classList.add('rtl'); // Arapça için sağdan sola
             
-            document.querySelectorAll('[data-key]').forEach(elem => {
-                elem.innerHTML = lang[elem.dataset.key];
-            });
+            document.querySelectorAll('[data-key]').forEach(elem => { elem.innerHTML = lang[elem.dataset.key]; });
 
-            // YÖNLENDİRME BUTONU İÇİN OLAY DİNLEYİCİSİ
-            document.getElementById('redirect-button').addEventListener('click', function(event) {
-                // Linkin varsayılan davranışını engelle
-                event.preventDefault();
+            // --- EN GÜVENİLİR YÖNLENDİRME MANTIĞI ---
+            
+            // Eğer tarayıcı hafızasında "redirectNow" işareti varsa, bu ikinci ziyaret demektir.
+            if (sessionStorage.getItem('redirectNow')) {
+                // İşareti temizle ve yönlendir.
+                sessionStorage.removeItem('redirectNow');
 
                 const iosUrl = 'https://apps.apple.com/tr/app/baby-gender-predictor-nubula/id6747091551';
                 const androidUrl = 'https://play.google.com/store/apps/details?id=com.sozensoftware.nubula';
@@ -148,11 +173,16 @@
                 if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
                     targetUrl = iosUrl;
                 }
+                // .replace() kullanmak, kullanıcının geri tuşuna bastığında tekrar bu sayfaya dönmesini engeller.
+                window.location.replace(targetUrl);
                 
-                // Yönlendirme işlemini yap
-                window.location.href = targetUrl;
-            });
-
+            } else {
+                // Eğer işaret yoksa, bu ilk ziyaret demektir.
+                // İşareti hafızaya bırak ve talimatları göster.
+                sessionStorage.setItem('redirectNow', 'true');
+                // Sayfayı görünür yap.
+                document.body.classList.remove('hidden');
+            }
         })();
     </script>
 </body>
